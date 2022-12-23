@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
-import puppeteer from 'puppeteer'
+import puppeteer, { Page, Browser } from 'puppeteer'
+import { Protocol } from 'puppeteer-core'
 import fs from 'fs'
 
 import MessageService from './service'
@@ -24,12 +25,12 @@ type ClientOptions = {
 }
 
 export type Credentials = {
-    cookies: puppeteer.Protocol.Network.CookieParam[],
+    cookies: Protocol.Network.CookieParam[],
     localStorage: object
 }
 class MessagesClient extends EventEmitter implements MessagesClient {
-    private page!: puppeteer.Page
-    private browser!: puppeteer.Browser
+    private page!: Page
+    private browser!: Browser
     private isAuthenticated: boolean = false
 
     constructor (options: ClientOptions = { headless: true, credentials: { cookies: [], localStorage: {} } }) {
@@ -145,11 +146,12 @@ class MessagesClient extends EventEmitter implements MessagesClient {
     private async setCredentials (credentials: Credentials) {
         await this.page.setCookie(...credentials.cookies)
         await this.page.evaluate((localStorageData) => {
+            let _localStorageData: {[key: string]: any }
             try {
-                localStorageData = JSON.parse(localStorageData)
+                _localStorageData = JSON.parse(localStorageData)
             } catch (err) {}
-            for (const key of Object.keys(localStorageData)) {
-                localStorage.setItem(key, localStorageData[key])
+            for (const key of Object.keys(_localStorageData)) {
+                localStorage.setItem(key, _localStorageData[key])
             }
         }, JSON.stringify(credentials.localStorage))
         await this.page.reload()

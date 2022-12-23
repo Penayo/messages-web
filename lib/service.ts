@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer'
+import puppeteer, { Page, ElementHandle } from 'puppeteer'
 
 type Conversation = {
     unread: boolean, 
@@ -8,8 +8,8 @@ type Conversation = {
     latestMsgText: string
 }
 class MessageService {
-    private page: puppeteer.Page
-    constructor (page: puppeteer.Page) {
+    private page: Page
+    constructor (page: Page) {
         this.page = page
     }
 
@@ -90,7 +90,7 @@ class MessageService {
             // numberInput.type(String.fromCharCode(13))
             await this.page.waitForXPath('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-new-conversation-container/div/mw-contact-selector-button/button')
             const contactBtn = await this.page.$x('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-new-conversation-container/div/mw-contact-selector-button/button')
-            await contactBtn[0].click()
+            await (contactBtn[0] as ElementHandle<Element>).click()
         }
         // await page.waitForSelector('body > mw-app > mw-bootstrap > div > main > mw-main-container > div > mw-conversation-container > div.container.ng-tns-c39-541.ng-star-inserted > div > mws-message-compose > div > div.input-box > div > mws-autosize-textarea > textarea', { visible: true })
         try {
@@ -103,7 +103,7 @@ class MessageService {
             await msgInput[0].type(text)
             await this.page.waitForXPath('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div/mws-message-compose/div/div[2]/div/mws-message-send-button/button')
             let sendBtn = await this.page.$x('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div/mws-message-compose/div/div[2]/div/mws-message-send-button/button')
-            await sendBtn[0].click()
+            await (sendBtn[0] as ElementHandle<Element>).click()
         } else {
             this.page.reload()
             console.warn('retrying...')
