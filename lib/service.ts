@@ -79,11 +79,11 @@ class MessageService {
         // })
         // const numberInput = await page.$('#mat-chip-list-2 > div > input')
         try {
-            await this.page.waitForXPath('//*[@id="mat-chip-list-0"]/div/input', { timeout: 5000 })
+            await this.page.waitForXPath('//mat-chip-listbox/span/input', { timeout: 5000 })
         } catch (err) { }
         // await page.waitForTimeout(2 * 1000) // remove lateer
-        // await this.page.waitForXPath('//*[@id="mat-chip-list-0"]/div/input')
-        let numberInput = await this.page.$x('//*[@id="mat-chip-list-0"]/div/input')
+        // await this.page.waitForXPath('//mat-chip-listbox/span/input')
+        let numberInput = await this.page.$x('//mat-chip-listbox/span/input')
         // console.log('NumberInput', numberInput)
         if (numberInput.length) {
             await numberInput[0].type(to)
@@ -94,16 +94,14 @@ class MessageService {
         }
         // await page.waitForSelector('body > mw-app > mw-bootstrap > div > main > mw-main-container > div > mw-conversation-container > div.container.ng-tns-c39-541.ng-star-inserted > div > mws-message-compose > div > div.input-box > div > mws-autosize-textarea > textarea', { visible: true })
         try {
-            await this.page.waitForXPath('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div/mws-message-compose/div/div[2]/div/mws-autosize-textarea/textarea')
+            await this.page.waitForXPath('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div[1]/div/mws-message-compose/div/div[2]/div/mws-autosize-textarea/textarea')
         } catch (err) {  }
         // await page.waitForTimeout(2 * 1000) // remove lateer
-        let msgInput = await this.page.$x('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div/mws-message-compose/div/div[2]/div/mws-autosize-textarea/textarea')
+        let msgInput = await this.page.$x('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div[1]/div/mws-message-compose/div/div[2]/div/mws-autosize-textarea/textarea')
         // console.log('MsgINput', msgInput)
         if (msgInput.length) {
             await msgInput[0].type(text)
-            await this.page.waitForXPath('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div/mws-message-compose/div/div[2]/div/mws-message-send-button/button')
-            let sendBtn = await this.page.$x('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div/mws-message-compose/div/div[2]/div/mws-message-send-button/button')
-            await (sendBtn[0] as ElementHandle<Element>).click()
+            this.page.keyboard.press('Enter');
         } else {
             this.page.reload()
             console.warn('retrying...')
