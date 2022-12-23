@@ -1,3 +1,7 @@
-import MessagesClient from './lib/client'
+import MessagesClient from './lib/client';
+import MessageService from './lib/service';
 
-export default MessagesClient
+export default {
+  MessagesClient,
+  MessageService,
+}

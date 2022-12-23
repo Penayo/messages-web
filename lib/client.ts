@@ -1,6 +1,5 @@
 import { EventEmitter } from 'events'
-import puppeteer, { Page, Browser } from 'puppeteer'
-import { Protocol } from 'puppeteer-core'
+import puppeteer, { Page, Browser, Protocol } from 'puppeteer'
 import fs from 'fs'
 
 import MessageService from './service'
@@ -65,6 +64,7 @@ class MessagesClient extends EventEmitter implements MessagesClient {
             this.emit('authenticated', service)
             this.isAuthenticated = true
         }
+
         try {
             await this.page.waitForSelector('#mat-checkbox-1')
             const dontshowCheckbox = await this.page.$('#mat-checkbox-1')
