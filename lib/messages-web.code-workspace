@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../test-apps/google-sms-api"
+		},
+		{
+			"path": "../../videocheck-api"
+		},
+		{
+			"path": "../../api-lapya"
+		}
+	],
+	"settings": {}
+}

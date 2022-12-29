@@ -1,4 +1,8 @@
 import puppeteer, { Page, ElementHandle } from 'puppeteer'
+import {
+    LAST_CONVERSATION_MESSAGES_STATUS_SELECTOR,
+    NEW_CONVERSATION_URL,
+} from './constants'
 
 type Conversation = {
     unread: boolean, 
@@ -7,6 +11,7 @@ type Conversation = {
     from: string, 
     latestMsgText: string
 }
+
 class MessageService {
     private page: Page
     constructor (page: Page) {
@@ -60,19 +65,11 @@ class MessageService {
     }
 
     async sendMessage (to: string, text: string) {
-        try {
-            await this.page.waitForNavigation({ waitUntil: 'domcontentloaded' })
-        } catch (err) {
-            // Empty loader attached for immediate requests
-            // if this function is called after few seconds/after after content loaded
-            // then its no issue else this will go in an exception because nothing is loading
+        if (this.page.url() !== NEW_CONVERSATION_URL) {
+            const newChatBtn = await this.page.$('body > mw-app > mw-bootstrap > div > main > mw-main-container > div > mw-main-nav > div > mw-fab-link > a');
+            await newChatBtn.click();
+            // Not waiting for page loaded!
         }
-        await this.page.waitForSelector('body > mw-app > mw-bootstrap > div > main > mw-main-container > div > mw-main-nav > mws-conversations-list > nav > div.conv-container.ng-star-inserted > mws-conversation-list-item')
-
-        // TODO: parse to var to check if country code is included or not
-        const newChatBtn = await this.page.$('body > mw-app > mw-bootstrap > div > main > mw-main-container > div > mw-main-nav > div > mw-fab-link > a')
-        await newChatBtn.click()
-        await this.page.waitForNavigation({ waitUntil: 'domcontentloaded' })
         // await page.waitForSelector()
         // const numberInput = await page.$eval('#mat-chip-list-2 > div > input', (input) => {
         //     console.log(input)
@@ -102,6 +99,8 @@ class MessageService {
         if (msgInput.length) {
             await msgInput[0].type(text)
             this.page.keyboard.press('Enter');
+            await this.page.waitForXPath(LAST_CONVERSATION_MESSAGES_STATUS_SELECTOR);
+            console.log('El estado del mensaje', this.page.$x(LAST_CONVERSATION_MESSAGES_STATUS_SELECTOR));
         } else {
             this.page.reload()
             console.warn('retrying...')
