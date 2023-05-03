@@ -2,6 +2,8 @@ import puppeteer, { Page, ElementHandle } from 'puppeteer'
 import {
     LAST_CONVERSATION_MESSAGES_STATUS_SELECTOR,
     NEW_CONVERSATION_URL,
+    NUMBER_INPUT_XPATH,
+    MESSAGE_TEXTAREA_XPATH
 } from './constants'
 
 type Conversation = {
@@ -65,7 +67,7 @@ class MessageService {
     }
 
     async sendMessage (to: string, text: string) {
-        console.log('URL', this.page.url(), NEW_CONVERSATION_URL)
+        // console.log('URL', this.page.url(), NEW_CONVERSATION_URL)
         if (this.page.url() !== NEW_CONVERSATION_URL) {
             const newChatBtn = await this.page.$('body > mw-app > mw-bootstrap > div > main > mw-main-container > div > mw-main-nav > div > mw-fab-link > a');
             await newChatBtn.click();
@@ -77,31 +79,37 @@ class MessageService {
         // })
         // const numberInput = await page.$('#mat-chip-list-2 > div > input')
         try {
-            await this.page.waitForXPath('//mat-chip-listbox/span/input', { timeout: 5000 })
-        } catch (err) { }
+            await this.page.waitForXPath(NUMBER_INPUT_XPATH, { timeout: 5000 })
+        } catch (err) {
+            console.log({ err })
+        }
         // await page.waitForTimeout(2 * 1000) // remove lateer
         // await this.page.waitForXPath('//mat-chip-listbox/span/input')
-        let numberInput = await this.page.$x('//mat-chip-listbox/span/input')
+        let numberInput = await this.page.$x(NUMBER_INPUT_XPATH)
         // console.log('NumberInput', numberInput)
-        if (numberInput.length) {
+        if (numberInput.length && numberInput.length > 0) {
             await numberInput[0].type(to)
             // numberInput.type(String.fromCharCode(13))
             await this.page.waitForXPath('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-new-conversation-container/div/mw-contact-selector-button/button')
             const contactBtn = await this.page.$x('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-new-conversation-container/div/mw-contact-selector-button/button')
             await (contactBtn[0] as ElementHandle<Element>).click()
+        } else {
+            console.log('Number Input not found!', { numberInput })
         }
         // await page.waitForSelector('body > mw-app > mw-bootstrap > div > main > mw-main-container > div > mw-conversation-container > div.container.ng-tns-c39-541.ng-star-inserted > div > mws-message-compose > div > div.input-box > div > mws-autosize-textarea > textarea', { visible: true })
         try {
-            await this.page.waitForXPath('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div[1]/div/mws-message-compose/div/div[2]/div/mws-autosize-textarea/textarea')
-        } catch (err) {  }
+            await this.page.waitForXPath(MESSAGE_TEXTAREA_XPATH)
+        } catch (err) {
+            console.log({ err })
+        }
         // await page.waitForTimeout(2 * 1000) // remove lateer
-        let msgInput = await this.page.$x('/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div[1]/div[1]/div/mws-message-compose/div/div[2]/div/mws-autosize-textarea/textarea')
+        let msgInput = await this.page.$x(MESSAGE_TEXTAREA_XPATH)
         // console.log('MsgINput', msgInput)
         if (msgInput.length) {
             await msgInput[0].type(text)
             this.page.keyboard.press('Enter');
             await this.page.waitForXPath(LAST_CONVERSATION_MESSAGES_STATUS_SELECTOR);
-            console.log('El estado del mensaje', this.page.$x(LAST_CONVERSATION_MESSAGES_STATUS_SELECTOR));
+            // console.log('El estado del mensaje', this.page.$x(LAST_CONVERSATION_MESSAGES_STATUS_SELECTOR));
         } else {
             this.page.reload()
             console.warn('retrying...')
