@@ -8,7 +8,7 @@ interface ClientEvents {
     'browser-launched': () => void,
     'qr-code': (base64Image: string) => void
 }
-declare interface MessagesClient {
+declare interface MessagesClientInterface {
     on<U extends keyof ClientEvents>(
       event: U, listener: ClientEvents[U]
     ): this,
@@ -27,7 +27,7 @@ export type Credentials = {
     cookies: Protocol.Network.CookieParam[],
     localStorage: object
 }
-class MessagesClient extends EventEmitter implements MessagesClient {
+class MessagesClient extends EventEmitter implements MessagesClientInterface {
     private page!: Page
     private browser!: Browser
     private isAuthenticated: boolean = false
@@ -79,6 +79,7 @@ class MessagesClient extends EventEmitter implements MessagesClient {
     private async attachReqTracer () {
         this.page.on('request', request => {
             const url = request.url()
+            console.log({ the_url: url })
             if (url.includes('Pairing/GetWebEncryptionKey')) {
                 const service = new MessageService(this.page)
                 if (!this.isAuthenticated) {
