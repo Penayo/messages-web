@@ -65,6 +65,7 @@ class MessageService {
     }
 
     async sendMessage (to: string, text: string) {
+        console.log('URL', this.page.url(), NEW_CONVERSATION_URL)
         if (this.page.url() !== NEW_CONVERSATION_URL) {
             const newChatBtn = await this.page.$('body > mw-app > mw-bootstrap > div > main > mw-main-container > div > mw-main-nav > div > mw-fab-link > a');
             await newChatBtn.click();
